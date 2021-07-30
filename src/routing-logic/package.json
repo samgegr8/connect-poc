@@ -1,0 +1,15 @@
+{
+  "name": "connect-project",
+  "version": "1.0.0",
+  "description": "Project to implement lambdas for Connect Initialisation Framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:samgegr8/connect-POC.git"
+  },
+  "author": "Samrat Som",
+  "license": "ISC"
+}

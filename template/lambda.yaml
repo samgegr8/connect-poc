@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: Lamda Functions for Connect
+Parameters:
+  ClientName:
+    Type: String
+    AllowedPattern: .+
+  Environment:
+    Type: String
+
+Resources:
+
+   # Basic lambda execution role for connect
+  LambdaConnectExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+      - PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Action:
+                - 'connect:*'
+              Effect: Allow
+              Resource: '*'
+        PolicyName: !Sub '${ClientName}-${Environment}-connectpolicy'
+      Description: Shared role for Basic Lambda Access
+      RoleName: !Sub '${ClientName}-${Environment}-LambdaConnectExecutionRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess'
+        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+
+  # Lambda function for Routing of Numbers
+  RoutingLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ClientName}-${Environment}-routing-numbers'
+      Description: Function to create performance report
+      CodeUri: ../src/routing-logic/
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Timeout: 900
+      MemorySize: 1024
+      Role: !GetAtt LambdaConnectExecutionRole.Arn
+      Environment:
+        Variables:
+          ROUTINGTABLE:
+            Fn::ImportValue: !Sub "${ClientName}-${Environment}-routing"
+
+  # Lambda function for Holiday Scheduling
+  HolidayLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ClientName}-${Environment}-holiday-list'
+      Description: Function to create performance report
+      CodeUri: ../src/holiday-logic/
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Timeout: 900
+      MemorySize: 1024
+      Role: !GetAtt LambdaConnectExecutionRole.Arn
+      Environment:
+        Variables:
+          HOLIDAYTABLE:
+            Fn::ImportValue: !Sub "${ClientName}-${Environment}-holiday"

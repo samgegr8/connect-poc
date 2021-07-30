@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: DynamoDB  tables for Connect
+Parameters:
+  Environment:
+    Type: String
+    Description: The environment to deploy for
+  ClientName:
+    Type: String
+    Description: The stack that deployed with the client name
+
+Resources:
+  RoutingTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: !Sub "${ClientName}-${Environment}-routing"
+      KeySchema:
+        - KeyType: HASH
+          AttributeName: DID
+      AttributeDefinitions:
+        - AttributeName: DID
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      Tags:
+        - Key: dynamodb
+          Value: connect-routing
+
+  HolidayTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: !Sub "${ClientName}-${Environment}-holiday"
+      KeySchema:
+        - KeyType: HASH
+          AttributeName: QueueName
+        - KeyType: RANGE
+          AttributeName: ID
+      AttributeDefinitions:
+        - AttributeName: QueueName
+          AttributeType: S
+        - AttributeName: ID
+          AttributeType: N
+      BillingMode: PAY_PER_REQUEST
+      Tags:
+        - Key: dynamodb
+          Value: connect-holiday
+
+Outputs:
+  RoutingTable:
+    Description: DynamoDB table for routing of calls
+    Value: !Ref RoutingTable
+    Export:
+      Name: !Sub "${ClientName}-${Environment}-routing"
+  HolidayTable:
+    Description: DynamoDB table for holiday scheduling
+    Value: !Ref HolidayTable
+    Export:
+      Name: !Sub "${ClientName}-${Environment}-holiday"

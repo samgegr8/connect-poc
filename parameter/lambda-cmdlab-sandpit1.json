@@ -1,0 +1,10 @@
+[
+    {
+        "ParameterKey": "ClientName",
+        "ParameterValue": "test"
+    },
+    {
+        "ParameterKey": "Environment",
+        "ParameterValue": "sandpit1"
+    }
+]
